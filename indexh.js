@@ -1618,18 +1618,6 @@ function BeeSwarmSimulator(DATA){
             }
         },
 
-        gummyBee_enter:{
-
-            minX:-8.5-3,maxX:-8.5+3,minY:12,maxY:18,minZ:-40-3,maxZ:-40+3,contactFunc:function(player){
-                
-                if(!player.lastGummyBeeMessage||TIME-player.lastGummyBeeMessage>3){
-
-                    player.lastGummyBeeMessage=TIME
-                    player.addMessage('Gummy Bee wants Gumdrops!',[0,200,100])
-                }
-            }
-        },
-
         gummyBee_tame:{
 
             isMachine:true,requirements:function(player){
@@ -2515,17 +2503,27 @@ function BeeSwarmSimulator(DATA){
 
     let beeInfo={
         hacker:{
-            
-            u:128*9/2048,v:256*2/2048,meshPartId:15,gatherSpeed:0.5,gatherAmount:30,speed:30,convertSpeed:0.1,convertAmount:1000,attack:8,energy:50,tokens:['blueBomb_','redBomb_','whiteBomb_','gummyBlob','gummyBarrage','beamStorm','rainCloud','tornado','targetPractice'],attackTokens:['impale','haste','mindHack','link'],rarity:'event',color:'blue',description:"This hacker bee takes great pleasure in being OP.",giftedHiveBonus:{oper:'+',stat:'defense',num:10}
+            u:128*15/2048,v:256*2/2048,meshPartId:15,gatherSpeed:0.1,gatherAmount:1000000,speed:50,convertSpeed:0.1,convertAmount:1000,attack:10000,energy:1e+309,tokens:['link','blueBomb_','redBomb_','whiteBomb_','gummyBlob','gummyBarrage','beamStorm','rainCloud','tornado','targetPractice','pollenMarkToken','honeyMarkToken','inferno','flameFuel'],attackTokens:['impale','haste','mindHack','link'],rarity:'event',color:'blue',description:"This hacker bee takes great pleasure in being OP.",giftedHiveBonus:{oper:'+',stat:'defense,attack,capacityMultiplier,instantRedConversion,instantBlueConversion,instantWhiteConversion',num:10},trails:[{length:10,size:0.25,color:[0,1,1,0.5],skipFrame:2,skipAdd:2},{length:7,size:0.075,triangle:true,color:[1,1,1,1],skipFrame:3,skipAdd:3,beeOffset:0.05}]
         },
-        fast:{
+        flame:{
             
-            u:128*5/2048,v:0,meshPartId:0,gatherSpeed:3,gatherAmount:10,speed:50,tokens:['haste'],convertSpeed:3,convertAmount:80,attack:1,attackTokens:['haste'],energy:20,favoriteTreat:'pineapple',rarity:'rare',color:'white',description:'A quick bee who always zips arounds. Sometimes it even makes YOU move faster.',giftedHiveBonus:{oper:'*',stat:'walkSpeed',num:5}
+            u:128*9/2048,v:0,meshPartId:0,gatherSpeed:0.05,gatherAmount:0,speed:50,convertSpeed:10,convertAmount:200,tokens:['inferno'],attack:5,attackTokens:['inferno','flameFuel*','rage'],energy:20,favoriteTreat:'strawberry',rarity:'rare',color:'red',description:'Some like it hot - this bee likes it scorching. Even the honey it makes is flamy.',giftedHiveBonus:{oper:'*',stat:'flameLife',num:1.25}
             
+        },
+        jump:{
+            
+            u:128*5/2048,v:0,meshPartId:0,gatherSpeed:3,gatherAmount:10,speed:20,tokens:['jump'],convertSpeed:3,convertAmount:80,attack:1,attackTokens:['jump'],energy:20,favoriteTreat:'pineapple',rarity:'rare',color:'white',description:'A jumpy bee who always zips arounds. Sometimes it even makes you jump higher.',giftedHiveBonus:{oper:'*',stat:'walkSpeed,jumpPower',num:2}
+            
+        },
+        fly:{
+            u:128*8/2048,v:256/2048,meshPartId:0,gatherSpeed:3,gatherAmount:10,speed:19.6,convertSpeed:2,convertAmount:180,tokens:[],attackTokens:[],attack:3,energy:20,rarity:'event',color:'white',description:"An ethereal bee that can fly. It even makes you fly",giftedHiveBonus:{oper:'+',stat:'instantWhiteConversion',num:0.15},trails:[{length:15,size:0.4,color:[0.5,0.5,0.5,0.4],skipFrame:4,skipAdd:4},{length:15,size:0.4,color:[0.5,0.5,0.5,0.4],skipFrame:4,skipAdd:4,vertical:true}]
         },
         basic:{
             
             u:0,v:0,meshPartId:0,gatherSpeed:4,gatherAmount:10,speed:14,convertSpeed:4,convertAmount:80,attack:1,energy:20,favoriteTreat:'sunflowerSeed',rarity:'common',color:'white',description:'An ordinary bee. Well rounded and hard working!',giftedHiveBonus:{oper:'*',stat:'redPollen,bluePollen,whitePollen',num:1.2}
+        },
+        useless:{
+            u:0,v:0,meshPartId:0,gatherSpeed:10,gatherAmount:1,speed:14,convertSpeed:10,convertAmount:8,attack:1,energy:20,favoriteTreat:'sunflowerSeed',rarity:'common',color:'white',description:'An useless bee.',giftedHiveBonus:{oper:'*',stat:'whitePollen',num:1}
         },
         random:{
             u:0,v:0,meshPartId:0,gatherSpeed:4,gatherAmount:10,speed:14,tokens:['focus','melody','link','blueBomb','redBomb','whiteBomb','blueBomb_','redBomb_','whiteBomb_','haste','pollenHaze','fuzzBomb','pollenMarkToken','honeyMarkToken','inferno','flameFuel','rage','markSurge','triangulate','summonFrog','blueBoost','redBoost','whiteBoost','babyLove','inflateBalloons','surpriseParty','gummyBlob','gummyBarrage','targetPractice','redPulse','redBombSync','bluePulse','blueBombSync','beamStorm','rainCloud','tornado','scratch','tabbyLove','bearMorphToken','fetch','puppyLove','festiveGifts','glitch','mapCorruption'],convertSpeed:4,convertAmount:80,attack:1,energy:20,favoriteTreat:'sunflowerSeed',rarity:'event',color:'white',description:'A bee generated from Math.random()',giftedHiveBonus:{oper:'*',stat:'redPollen,bluePollen,whitePollen',num:2}
@@ -3824,6 +3822,31 @@ function BeeSwarmSimulator(DATA){
             getMessage:(amount)=>{
                 
                 return 'Haste+\nx1.5 walkspeed'
+            }
+        },
+        
+        jump:{
+            
+            desc:"Grants x1.1 jump power for 25s. Stacks up to 10x, for a maximum of x2 jump power.",
+            trialCooldown:15,trialRate:0.5,
+            statsToAddTo:['hasteTokens'],
+            u:0,v:0,
+            svg:document.getElementById('jump'),
+            cooldown:document.getElementById('jump_cooldown'),
+            amount:document.getElementById('jump_amount'),
+            maxCooldown:25,
+            maxAmount:10,
+            tokenLife:4,
+            
+            update:(amount,player)=>{
+                
+                player.jumpPower*=player.roboChallenge?amount*0.02+1:amount*0.075+1
+                player.hasteStacks=amount
+            },
+            
+            getMessage:(amount)=>{
+                
+                return 'Jump\nx'+(player.roboChallenge?amount*0.02+1:amount*0.075+1).toFixed(1)+' jump power'+(player.roboChallenge?'\n\n(nerfed due to Robo Challenge!)':'')
             }
         },
         
@@ -9367,13 +9390,13 @@ function BeeSwarmSimulator(DATA){
                 amount:0,u:128*4/2048,v:128*5/2048,value:Infinity,
                 use:function(){
                     var amou=0;
-                    if(i!='random'){
+                    if(i!='random'&&i!='hacker'){
                         amou=undefined
                     }
                     for(let j in objects.bees){
                         
                         if(objects.bees[j].type===i){
-                            if(i=='random'){
+                            if(i=='random'||i=='hacker'){
                                 amou++
                             }
                             else{
@@ -9383,8 +9406,8 @@ function BeeSwarmSimulator(DATA){
                         }
                     }
                     if(amou){
-                        if (amou>=items['randomBeeEgg'].amount){
-                            player.addMessage('You can only have '+items['randomBeeEgg'].amount+' '+MATH.doGrammar(i)+' Bee!',COLORS.redArr)
+                        if (amou>=items[i+'BeeEgg'].amount){
+                            player.addMessage('You can only have '+items[i+'BeeEgg'].amount+' '+MATH.doGrammar(i)+' Bees!',COLORS.redArr)
                             return
                         }
                     }
@@ -21320,7 +21343,7 @@ function BeeSwarmSimulator(DATA){
         }
         
         out.precomputedStats={
-
+            
             monsterRespawnTime:1,
             bondFromTreats:1,
             nectarMultiplier:1,
@@ -21388,7 +21411,8 @@ function BeeSwarmSimulator(DATA){
             redBombSync:false,
             blueBombSync:false,
             flameLife:1,
-            abilityDuplicationChance:0
+            abilityDuplicationChance:0,
+            flying:false
         }
         
         out.defaultStats={}
@@ -23793,7 +23817,18 @@ function BeeSwarmSimulator(DATA){
                 out.body.velocity.z=out.bodyDir[2]*out.gliderSpeed
                 out.body.velocity.y=out.gliderFall
             }
-            
+            var ftest=false;
+            for(let i in objects.bees){
+                if(objects.bees[i].gifted&&objects.bees[i].type==="fly"){
+                    ftest=true
+                }
+            }
+            out.flying=ftest;
+            if(out.flying){
+                if(user.keys.z){
+                    out.body.velocity.y=out.jumpPower
+                }
+            }
             if(out.grounded){
                 
                 if(out.isGliding){
@@ -25008,8 +25043,7 @@ function BeeSwarmSimulator(DATA){
                 viewMatrix:[10-4.5,1,13.5-4.5,MATH.HALF_PI+MATH.QUATER_PI,0.02],
                 cost:[(n,i=1)=>(Math.min(500*Math.pow(1.35,n)*i,10000000)|0)+' honey'],
                 desc:'Can be used to hatch a Basic Bee!'
-            },
-            {
+            },{
 
                 amountPurchased:0,maxPurchasedAmount:10,
                 name:'randomBeeEgg',
@@ -25017,6 +25051,14 @@ function BeeSwarmSimulator(DATA){
                 viewMatrix:[10-4.5,1,13.5-4.5,MATH.HALF_PI+MATH.QUATER_PI,0.02],
                 cost:['100000000 honey'],
                 desc:'Can be used to hatch the Random Bee!'
+            },{
+
+                amountPurchased:0,maxPurchasedAmount:Infinity,
+                name:'hackerBeeEgg',
+                slot:'item',
+                viewMatrix:[10-4.5,1,13.5-4.5,MATH.HALF_PI+MATH.QUATER_PI,0.02],
+                cost:['20000000000000 honey'],
+                desc:'Can be used to hatch the Hacker Bee!'
             }],
             currentIndex:0,message:'Explore Basic Egg Shop'
         },
@@ -25254,6 +25296,14 @@ function BeeSwarmSimulator(DATA){
                 name:'superSaturator',
                 slot:'sprinkler',
                 viewMatrix:[48+4,14+1.5,55.075,-MATH.HALF_PI,-0.3],
+                displayPos:[48,14,55.075],
+                displayRot:[0,90,0],
+                displayScale:[1.2,1.2,1.2],
+            },{
+
+                name:'ultimate',
+                slot:'sprinkler',
+                viewMatrix:[48+4,14+1.5,53.075,-MATH.HALF_PI,-0.3],
                 displayPos:[48,14,55.075],
                 displayRot:[0,90,0],
                 displayScale:[1.2,1.2,1.2],
@@ -30633,7 +30683,7 @@ function BeeSwarmSimulator(DATA){
             51.5,17,-19,6,-0.5,-0.1,0.5,0.2,beeInfo.windy.u,beeInfo.windy.v,beeInfo.windy.meshPartId,
             -7,15,-41,3,-0.7,0,0.3,-0.1,beeInfo.gummy.u,beeInfo.gummy.v,beeInfo.gummy.meshPartId,
             2,6.5,61,3,0,-0.2,-1,-0.2,beeInfo.vicious.u,beeInfo.vicious.v,beeInfo.vicious.meshPartId,
-            2,6.5,61,3,0,-0.2,-1,-0.2,beeInfo.hacker.u,beeInfo.hacker.v,beeInfo.hacker.meshPartId,
+            61,12,34,1.5,-1,0,0,BEE_FLY,beeInfo.hacker.u,beeInfo.hacker.v,beeInfo.hacker.meshPartId,
             61,12,34,1.5,-1,0,0,BEE_FLY,beeInfo.digital.u,beeInfo.digital.v,beeInfo.digital.meshPartId,
             35,8.5,22,6,-1,-0.2,-0.2,-0.08,beeInfo.riley.u,beeInfo.riley.v,beeInfo.riley.meshPartId,
             51.75,16,22,3,-1,0,0,BEE_FLY,beeInfo.riley.u,beeInfo.riley.v+0.375,beeInfo.riley.meshPartId,
